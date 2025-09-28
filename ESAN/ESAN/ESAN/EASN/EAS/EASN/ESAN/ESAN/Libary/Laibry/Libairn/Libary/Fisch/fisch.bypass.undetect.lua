@@ -45,8 +45,6 @@ local function makeNotifyFrame(title, desc)
 
     local card = Instance.new("Frame")
     card.Name = "Card"
-    card.AnchorPoint = Vector2.new(0, 0)
-    card.Position = UDim2.new(0, 0, 0, 0)
     card.Size = UDim2.new(1, 0, 0, NOTIFY_HEIGHT)
     card.BackgroundColor3 = Color3.fromRGB(28, 30, 38)
     card.BorderSizePixel = 0
@@ -64,47 +62,48 @@ local function makeNotifyFrame(title, desc)
     stroke.Transparency = 0.8
     stroke.Parent = card
 
+    -- Icon (ซ้าย)
+    local icon = Instance.new("ImageLabel")
+    icon.Name = "Icon"
+    icon.Size = UDim2.new(0, 48, 0, 48)
+    icon.Position = UDim2.new(0, 12, 0, 16)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://106249685759117"
+    icon.Parent = card
+
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(0, 8)
+    iconCorner.Parent = icon
+
+    -- Title (เลื่อนมาขวา ไม่โดน Icon บัง)
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
     titleLabel.BackgroundTransparency = 1
-    titleLabel.Size = UDim2.new(1, -16, 0, 24)
-    titleLabel.Position = UDim2.new(0, 12, 0, 8)
+    titleLabel.Size = UDim2.new(1, -76, 0, 24) -- -76 เว้นที่ให้ไอคอน
+    titleLabel.Position = UDim2.new(0, 68, 0, 8) -- 68 = 48 icon + 12 padding + 8 margin
     titleLabel.Font = Enum.Font.GothamBold
     titleLabel.TextSize = 18
     titleLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    titleLabel.TextYAlignment = Enum.TextYAlignment.Top
     titleLabel.Text = tostring(title or "")
-    titleLabel.TextTransparency = 1 -- start hidden
+    titleLabel.TextTransparency = 1
     titleLabel.Parent = card
 
+    -- Description (ใต้ Title เลื่อนมาขวาด้วย)
     local descLabel = Instance.new("TextLabel")
     descLabel.Name = "Desc"
     descLabel.BackgroundTransparency = 1
-    descLabel.Size = UDim2.new(1, -16, 0, 44)
-    descLabel.Position = UDim2.new(0, 12, 0, 30)
+    descLabel.Size = UDim2.new(1, -76, 0, 44)
+    descLabel.Position = UDim2.new(0, 68, 0, 30)
     descLabel.Font = Enum.Font.Gotham
     descLabel.TextSize = 14
     descLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
     descLabel.TextXAlignment = Enum.TextXAlignment.Left
     descLabel.TextYAlignment = Enum.TextYAlignment.Top
     descLabel.TextWrapped = true
-    descLabel.RichText = false
     descLabel.Text = tostring(desc or "")
-    descLabel.TextTransparency = 1 -- start hidden
+    descLabel.TextTransparency = 1
     descLabel.Parent = card
-
-    local icon = Instance.new("ImageLabel")
-    icon.Name = "Icon"
-    icon.Size = UDim2.new(0, 48, 0, 48)
-    icon.Position = UDim2.new(0, 12, 0, 16)
-    icon.BackgroundTransparency = 1
-    icon.Image = "rbxassetid://106249685759117" -- << ไอคอน
-    icon.Parent = card
-    
-    local iconCorner = Instance.new("UICorner")
-    iconCorner.CornerRadius = UDim.new(0, 8)
-    iconCorner.Parent = icon
 
     card.Active = true
     card.InputBegan:Connect(function(input)
@@ -148,9 +147,9 @@ function notify(title, description, duration)
     openTween:Play()
     fadeIn:Play()
 
-    -- Fade in text
     local titleLabel = card:FindFirstChild("Title")
     local descLabel = card:FindFirstChild("Desc")
+
     if titleLabel then
         TweenService:Create(titleLabel, TweenInfo.new(0.25), {TextTransparency = 0}):Play()
     end
@@ -158,23 +157,19 @@ function notify(title, description, duration)
         TweenService:Create(descLabel, TweenInfo.new(0.25), {TextTransparency = 0}):Play()
     end
 
-    -- Icon animation
     local icon = card:FindFirstChild("Icon")
     if icon then
         icon.Size = UDim2.new(0, 0, 0, 0)
-        local iconTween = TweenService:Create(icon, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-            {Size = UDim2.new(0, 48, 0, 48)})
-        iconTween:Play()
+        TweenService:Create(icon, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Size = UDim2.new(0, 48, 0, 48)}):Play()
     end
 
-    -- Wait until time runs out
     local t0 = tick()
     while tick() - t0 < duration do
         if frame:GetAttribute("forceRemove") then break end
         task.wait(0.1)
     end
 
-    -- Fade out
     local closeTween = TweenService:Create(frame, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
         {Size = UDim2.new(1, 0, 0, 0)})
     local fadeOut = TweenService:Create(card, TweenInfo.new(0.22), {BackgroundTransparency = 1})
