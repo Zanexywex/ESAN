@@ -87,19 +87,17 @@ local function makeNotifyFrame(title, desc)
     descLabel.RichText = false
     descLabel.Text = tostring(desc or "")
     descLabel.Parent = card
-    local icon = Instance.new("Frame")
+    local icon = Instance.new("ImageLabel")
     icon.Name = "Icon"
     icon.Size = UDim2.new(0, 48, 0, 48)
     icon.Position = UDim2.new(0, 12, 0, 16)
-    icon.BackgroundColor3 = Color3.fromRGB(40, 120, 255)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://106249685759117" -- << ใส่ไอคอนของคุณตรงนี้
     icon.Parent = card
+    
     local iconCorner = Instance.new("UICorner")
     iconCorner.CornerRadius = UDim.new(0, 8)
     iconCorner.Parent = icon
-    titleLabel.Position = UDim2.new(0, 12 + 56, 0, 8)
-    titleLabel.Size = UDim2.new(1, -16 - 56, 0, 24)
-    descLabel.Position = UDim2.new(0, 12 + 56, 0, 30)
-    descLabel.Size = UDim2.new(1, -16 - 56, 0, 44)
 
     card.Active = true
     card.InputBegan:Connect(function(input)
